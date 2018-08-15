@@ -24,8 +24,10 @@ El programa le dira que esta listo el archivo:
 Escribiendo archivo ..........
 Archivo Escrito
 
-##Salida
-El programa genera un archivo ".tex" que le quiso dar en este caso en lo que se ingresa en el ejemplo:
+Salida
+
+El programa genera un archivo ".tex" que le quiso dar en este 
+caso en lo que se ingresa en el ejemplo:
 
 ejemplo.tex
 
