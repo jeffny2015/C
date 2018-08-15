@@ -1,8 +1,8 @@
--Tarea 1 SO
+Tarea 1 SO
 
--Jeffrey Alfaro Fonseca 20155069856
+Jeffrey Alfaro Fonseca 20155069856
 
-## Programa
+# Programa
 Programa hecho en C para linux y sigue las epecificaciones del archivo "Tarea1.pdf", compuesto por main.c y main.h, no se modulariza, el programa comienza ejecutandose
 con el makefile, abre una terminal en la direción de la carpeta donde se encuentra el archivo "makefile":
 
@@ -24,13 +24,12 @@ El programa le dira que esta listo el archivo:
 Escribiendo archivo ..........
 Archivo Escrito
 
-###Salida
-
+##Salida
 El programa genera un archivo ".tex" que le quiso dar en este caso en lo que se ingresa en el ejemplo:
 
 ejemplo.tex
 
-##### Notas
+#### Notas
 
 No se verfica si el formato del .txt viene según la forma que indica el archivo de la Tarea1.pdf, entonces si no viene
 según el formato, entonces el programa se cae.
