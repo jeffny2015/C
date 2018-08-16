@@ -207,36 +207,26 @@ void escribirFIFO(struct Proceso *fifo,FILE *archivo_tex){
 	int wt[lenlista];
 	wt[0] = 0;
 
-	/*printf("FIFO\n");
-	printf("--------------------------\n");*/
+	/*Recorremos la lista y vamos sacando
+	el waiting time  en el que se va acumulando la duracion de
+	todos los procesos*/
 	for (int i = 0; i < lenlista; i++) {
 		duracion_total += fifo[i].duracion;
 		if(i >= 1){
 			wt[i] = duracion_total - fifo[i].duracion - fifo[i].llegada;
 		}
-		/*printf("Pid: P%d ", fifo[i].pid);
-		printf("Llegada: %d ", fifo[i].llegada);
-		printf("Duracion: %d ", fifo[i].duracion);
-		printf("Prioridad: %d ", fifo[i].prioridad);
-		printf("\n");*/
-	}
 
-	/*int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < lenlista; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
 	}
-	printf(" = %d/%d\n",total,lenlista);
-	printf("--------------------------\n");*/
 	escribirCuerpo(archivo_tex,fifo,lenlista,wt, "FIFO");
 	free(fifo);
 }
 
 /************HPF**********************/
 void escribirHPF(struct Proceso *hpf,FILE *archivo_tex){
-	int p_actual = 1000, pos_actual = 0;
-	int prioridad_actual = -1, duracion_total = 0;
+	int p_actual = 1000;
+	int pos_actual = 0;
+	int prioridad_actual = -1;
+	int duracion_total = 0;
   int wt[lenlista];
 	struct Proceso aux;
 	int iactual = 0, entro = 0;
@@ -244,13 +234,19 @@ void escribirHPF(struct Proceso *hpf,FILE *archivo_tex){
 	int pos_menor_tiempo_llegada = 0;
 	int primer_pro = 1;
 
+	//Buscamos a ver cual proceso llego primer
+	//y lo tomamos como referencia
 	for (int z = 0; z < lenlista; z++) {
 			if(hpf[z].llegada < tiempo_llegada_actual){
 				tiempo_llegada_actual = hpf[z].llegada;
 
 			}
 	}
+
 	duracion_total += tiempo_llegada_actual;
+	//Recorremos la lista  buscamos quien llega primero
+	//y que prioridad tiene
+	//hacemos el cambio que haya que hacer
 	for (int i = 0; i < lenlista - 1; i++) {
 		prioridad_actual = -1;
 		for (int j = i; j < lenlista; j++) {
@@ -273,6 +269,7 @@ void escribirHPF(struct Proceso *hpf,FILE *archivo_tex){
 				}
 			}
 		}
+
 		aux = hpf[i];
 		hpf[i] = hpf[pos_actual];
 		hpf[pos_actual] = aux;
@@ -288,24 +285,6 @@ void escribirHPF(struct Proceso *hpf,FILE *archivo_tex){
 	}
 	duracion_total+= hpf[lenlista - 1].duracion;
 	wt[lenlista - 1] = duracion_total - hpf[lenlista - 1].llegada - hpf[lenlista - 1].duracion;
-	/*printf("HPF\n");
-	printf("--------------------------\n");
-	for (int i = 0; i < lenlista; i++) {
-
-		printf("Pid: P%d ", hpf[i].pid);
-		printf("Llegada: %d ", hpf[i].llegada);
-		printf("Duracion: %d ", hpf[i].duracion);
-		printf("Prioridad: %d ", hpf[i].prioridad);
-		printf("\n");
-	}
-	int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < lenlista; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
-	}
-	printf(" = %d/%d\n",total,lenlista);
-	printf("--------------------------\n");*/
 	escribirCuerpo(archivo_tex,hpf,lenlista,wt, "HPF");
 	free(hpf);
 }
@@ -321,6 +300,8 @@ void escribirSJF(struct Proceso *sjf,FILE *archivo_tex){
 	int pos_menor_tiempo_llegada = 0;
 	int primer_pro = 1;
 
+	//Buscamos a ver cual proceso llego primer
+	//y lo tomamos como referencia
 	for (int z = 0; z < lenlista; z++) {
 			if(sjf[z].llegada < tiempo_llegada_actual){
 				tiempo_llegada_actual = sjf[z].llegada;
@@ -328,6 +309,8 @@ void escribirSJF(struct Proceso *sjf,FILE *archivo_tex){
 			}
 	}
 	duracion_total += tiempo_llegada_actual;
+	//Recorremos la lista vemos quien llega primero
+	// y que duraion tiene
 	for (int i = 0; i < lenlista - 1; i++) {
 		duracion_actual = -1;
 		for (int j = i; j < lenlista; j++) {
@@ -349,12 +332,14 @@ void escribirSJF(struct Proceso *sjf,FILE *archivo_tex){
 				}
 			}
 		}
+		//Se hacen los cambios
 		aux = sjf[i];
 		sjf[i] = sjf[pos_actual];
 		sjf[pos_actual] = aux;
 		duracion_total+= sjf[i].duracion;
 		tiempo_llegada_actual = duracion_total;
 
+		//Se ingresa el waiting time
 		if(primer_pro == 0){
 			wt[i] = duracion_total - sjf[i].llegada - sjf[i].duracion;
 		}else{
@@ -364,27 +349,6 @@ void escribirSJF(struct Proceso *sjf,FILE *archivo_tex){
 	}
 	duracion_total+= sjf[lenlista - 1].duracion;
 	wt[lenlista - 1] = duracion_total - sjf[lenlista - 1].llegada - sjf[lenlista - 1].duracion;
-	/*
-	printf("SJF\n");
-	printf("--------------------------\n");
-	for (int i = 0; i < lenlista; i++) {
-
-		printf("Pid: P%d ", sjf[i].pid);
-		printf("Llegada: %d ", sjf[i].llegada);
-		printf("Duracion: %d ", sjf[i].duracion);
-		printf("Prioridad: %d ", sjf[i].prioridad);
-		printf("\n");
-	}
-
-	int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < lenlista; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
-	}
-	printf(" = %d/%d\n",total,lenlista);
-
-	printf("--------------------------\n");*/
 	escribirCuerpo(archivo_tex,sjf,lenlista,wt, "SJF");
 	free(sjf);
 }
@@ -410,6 +374,8 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 	int primer_pro = 1;
 	int len_aux = lenlista, duracionmenoracero = 0;
 	int tiempototal = 0;
+	//Buscamos a ver cual proceso llego primer
+	//y lo tomamos como referencia
 	for (int z = 0; z < lenlista; z++) {
 			if(hpf_exp[z].llegada < tiempo_llegada_actual){
 				tiempo_llegada_actual = hpf_exp[z].llegada;
@@ -418,6 +384,8 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 	}
 	duracion_total += tiempo_llegada_actual;
 	duracion_aux += tiempo_llegada_actual;
+	//Recorremos la lista vemos vemos quien llega primero
+	//luego vemos la prioridad
 	for (int i = 0; i < len_aux ; i++) {
 		prioridad_actual = -1;
 		for (int j = i; j < len_aux; j++) {
@@ -435,6 +403,7 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 				}
 			}
 		}
+		//hacemos el cambio
 		aux = hpf_exp[i];
 		hpf_exp[i] = hpf_exp[pos_actual];
 		hpf_exp[pos_actual] = aux;
@@ -442,6 +411,7 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 		tiempo_llegada_actual = duracion_total;
 		duracion_aux++;
 		duracion_aux2 = 1000;
+		//Buscamos el siguiente proceso que tenga el el tiempo de Llegada
 		for (int z = i; z < len_aux; z++) {
 				if(hpf_exp[z].llegada < duracion_aux2){
 					duracion_aux2 = hpf_exp[z].llegada;
@@ -450,6 +420,8 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 		}
 		duracion_aux += duracion_aux2;
 		if (primer_pro == 0) {
+			//Comparamos la prioridad
+			//a ver ssi tenemos que mandar el proceso anterior fuera de runnig
 			if(hpf_exp[i].prioridad  < hpf_exp[i - 1].prioridad){
 					len_aux = len_aux + 1;
 					hpf_exp = realloc(hpf_exp,len_aux*sizeof(struct Proceso));
@@ -466,7 +438,9 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 		primer_pro = 0;
 
 	}
-
+	//Por motivos de tiempo hice esto por aparte
+	//y reacomode el tiempo de llegada de los procesos
+	//que se repiten
 	int lleg = 0,llegaux;
 	for (int i = 0; i < len_aux; i++) {
 		lleg += hpf_exp[i].duracion;
@@ -483,8 +457,7 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 	}
 	wt[len_aux];
 	wt[0] = 0;
-	//printf("HPF-Expropiativo\n");
-	//printf("--------------------------\n");
+	//Sacamos el wt
 	nuevo_tiempo_llegada += hpf_exp[0].duracion;
 	for (int i = 0; i < len_aux; i++) {
 		if(i > 0){
@@ -492,21 +465,7 @@ void escribirHPF_EXP(struct Proceso *hpf_exp,FILE *archivo_tex){
 			nuevo_tiempo_llegada += hpf_exp[i].duracion;
 
 		}
-		//printf("Pid: P%d ", hpf_exp[i].pid);
-		//printf("Llegada: %d ", hpf_exp[i].llegada);
-	//	printf("Duracion: %d ", hpf_exp[i].duracion);
-		//printf("Prioridad: %d ", hpf_exp[i].prioridad);
-		//printf("\n");
 	}
-
-	/*int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < len_aux; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
-	}
-	printf(" = %d/%d\n",total,lenlista);
-	printf("--------------------------\n");*/
 	escribirCuerpo(archivo_tex,hpf_exp,len_aux,wt, "HPF-Expropiativo");
 	free(hpf_exp);
 }
@@ -517,10 +476,11 @@ void escribirRR(struct Proceso *rr,int tiempo,FILE *archivo_tex){
 	struct Proceso aux;
 	int duracion_total = 0, duracion_aux = 0, duracion_total_aux = 0;
 	duracion_total += rr[0].llegada;
+	//Lo mismo que fifo solo que hay una restricion de tiempo
+	//vamos comparando el tiempo para ver si se tiene que sacar
+	//el proceso de running
 	for (int i = 0; i < len_aux; i++) {
-
 			duracion_aux = rr[i].duracion - tiempo;
-
 			if(duracion_aux > 0){
 				duracion_total += tiempo;
 				len_aux = len_aux + 1;
@@ -539,28 +499,13 @@ void escribirRR(struct Proceso *rr,int tiempo,FILE *archivo_tex){
 	int wt[len_aux];
 	int total_tiempo = rr[0].llegada;
 	wt[0] = 0;
-
-	//printf("RR-%d\n",tiempo);
-	//printf("--------------------------\n");
+	//Sacamos el wt
 	for (int i = 0; i < len_aux; i++) {
 		total_tiempo += rr[i].duracion;
 		if (i > 0) {
 			wt[i] =  total_tiempo - rr[i].llegada - rr[i].duracion;
 		}
-		/*printf("Pid: P%d ", rr[i].pid);
-		printf("Llegada: %d ", rr[i].llegada);
-		printf("Duracion: %d ", rr[i].duracion);
-		printf("Prioridad: %d ", rr[i].prioridad);
-		printf("\n");*/
 	}
-	/*int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < len_aux; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
-	}
-	printf(" = %d/%d\n",total,lenlista);
-	printf("--------------------------\n");*/
 	if(tiempo == 2){
 			escribirCuerpo(archivo_tex,rr,len_aux,wt, "RR-2");
 	}else{
@@ -581,6 +526,8 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 	int pos_menor_tiempo_llegada = 0;
 	int primer_pro = 1;
 	int crono = 0 , crono_aux = 0, duracion_tmp = 0;
+
+	//Sacamos el menor tiempo de llegada de los procesos
 	for (int z = 0; z < lenlista; z++) {
 			if(srt[z].llegada < tiempo_llegada_actual){
 				tiempo_llegada_actual = srt[z].llegada;
@@ -589,6 +536,8 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 	}
 	duracion_total += tiempo_llegada_actual;
 	crono = tiempo_llegada_actual;
+	//recorremos la lista comparamos a ver quien llega primero
+	//luego comparamos el tiempo de duracion
 	for (int i = 0; i < len_aux; i++) {
 		duracion_actual = -1;
 		for (int j = i; j < len_aux; j++) {
@@ -610,11 +559,13 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 				}
 			}
 		}
+		//hacemos el intercambio necesario no importa si es el mismo nodo
 		aux = srt[i];
 		srt[i] = srt[pos_actual];
 		srt[pos_actual] = aux;
 		crono++;
 		crono_aux = 1000;
+		//Buscamos el siguiente proceso con el proceso de llegada menor
 		for (int z = i; z < len_aux; z++) {
 				if(srt[z].llegada < crono_aux){
 					crono_aux = srt[z].llegada;
@@ -624,6 +575,8 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 		duracion_total+= srt[i].duracion;
 		tiempo_llegada_actual = duracion_total;
 		if (primer_pro == 0) {
+			//Comparamos a ver si la duracion del proceso es menor
+			//y si lo es sacamos el proceso del running y extendemos la lista
 			if(srt[i].duracion  < srt[i - 1].duracion){
 				if(srt[i - 1].duracion - srt[i].duracion > srt[i].duracion){
 					len_aux = len_aux + 1;
@@ -646,7 +599,8 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 
 
 	}
-
+	//se acomoda el tiempo de llegada de los procesos que se repirten
+	//en la lista
 	int lleg = 0,llegaux;
 	for (int i = 0; i < len_aux; i++) {
 		lleg += srt[i].duracion;
@@ -663,30 +617,15 @@ void escribirSRT(struct Proceso *srt,FILE *archivo_tex){
 	}
 	wt[len_aux];
 	wt[0] = 0;
-	//printf("SRT\n");
-	//printf("--------------------------\n");
 	nuevo_tiempo_llegada += srt[0].duracion;
+	//Se saca el waiting time
 	for (int i = 0; i < len_aux; i++) {
 		if(i > 0){
 			wt[i] = nuevo_tiempo_llegada - srt[i].llegada;
 			nuevo_tiempo_llegada += srt[i].duracion;
-
 		}
-		/*printf("Pid: P%d ", srt[i].pid);
-		printf("Llegada: %d ", srt[i].llegada);
-		printf("Duracion: %d ", srt[i].duracion);
-		printf("Prioridad: %d ", srt[i].prioridad);
-		printf("\n");*/
 	}
 
-/*	int total = 0;
-	printf("WT => ");
-	for (int i = 0; i < len_aux; i++) {
-		printf("%d ",wt[i]);
-		total += wt[i];
-	}
-	printf(" = %d/%d\n",total,lenlista);
-	printf("--------------------------\n");*/
 	escribirCuerpo(archivo_tex,srt,len_aux,wt, "SRT");
 	free(srt);
 }
